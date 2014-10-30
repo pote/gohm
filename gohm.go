@@ -5,7 +5,6 @@ import(
 	"github.com/pote/go-msgpack"
 	"github.com/pote/redisurl"
 	"reflect"
-	"fmt"
 )
 
 type gohm struct {
@@ -173,7 +172,6 @@ func (g *gohm) Save(model Model, indices... string) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Features: %v\n", features)
 
 	// Prepare Ohm-scripts `attributes` parameter
 	attrs := []string{}
@@ -187,7 +185,6 @@ func (g *gohm) Save(model Model, indices... string) (err error) {
 		attrs = append(attrs, tag)
 		attrs = append(attrs, modelData.Field(i).String())
 	}
-	fmt.Printf("Attributes: %v\n", attrs)
 	ohmAttrs, err := msgpack.Marshal(attrs)
 	if err != nil {
 		return err
@@ -209,10 +206,9 @@ func (g *gohm) Save(model Model, indices... string) (err error) {
 
 	conn := g.RedisPool.Get()
 	defer conn.Close()
+	_, err =  g.LuaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques)
 
-	g.LuaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques)
-
-	return
+	return err
 }
 
 type Model interface {

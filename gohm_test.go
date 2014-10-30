@@ -19,6 +19,10 @@ func TestSave(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	cleanupConn := Gohm.RedisPool.Get()
+	defer cleanupConn.Do("SCRIPT FLUSH")
+	defer cleanupConn.Do("FLUSHDB")
+	defer cleanupConn.Close()
 
 	user := &User{
 		Name: "Marty",
@@ -29,10 +33,4 @@ func TestSave(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-
-	//cleanupConn := connectionPool.Get()
-	//cleanupConn.Do("SCRIPT FLUSH")
-	//cleanupConn.Do("FLUSHDB")
-	//defer cleanupConn.Close()
 }
