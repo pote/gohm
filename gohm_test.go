@@ -8,8 +8,8 @@ import(
 type user struct {
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
-	UUID  string `ohm:"name unique"`
 	Email string `ohm:"email index"`
+	UUID  string `ohm:"uuid unique"`
 }
 
 func dbCleanup() {

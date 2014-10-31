@@ -1,14 +1,15 @@
 package gohm
 
 import(
-	"testing"
+	`reflect`
+	`testing`
 )
 
 type validModel struct {
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
 	Email string `ohm:"email index"`
-	UUID  string `ohm:"name unique"`
+	UUID  string `ohm:"uuid unique"`
 }
 
 type unexportedFieldModel struct {
@@ -40,5 +41,19 @@ func TestValidateModel(t *testing.T) {
 
 	if err = ValidateModel(&nonStringIDModel{}); err != NonStringIDError {
 		t.Error(`models should be invalid when their ohm:"id" field is not a string`)
+	}
+}
+
+func TestModelAttrIndexMap(t *testing.T) {
+	attrMap := ModelAttrIndexMap(&validModel{})
+
+	expectedMap := map[string]int{
+		`name`:  1,
+		`email`: 2,
+		`uuid`:  3,
+	}
+
+	if !reflect.DeepEqual(expectedMap, attrMap) {
+		t.Errorf(`expected %v, got %v`, expectedMap, attrMap)
 	}
 }

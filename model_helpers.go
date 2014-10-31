@@ -51,7 +51,7 @@ func ModelAttrIndexMap(model interface{}) (map[string]int) {
 	typeData := reflect.TypeOf(model).Elem()
 	for i := 0; i < typeData.NumField(); i++ {
 		field := typeData.Field(i)
-		tag := field.Tag.Get(`ohm`)
+		tag := strings.Split(field.Tag.Get(`ohm`), ` `)[0]
 		if tag != `` && tag != `-` && tag != "id" {
 			attrs[tag] = i
 		}
