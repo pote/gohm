@@ -1,0 +1,42 @@
+# Gohm ॐ - Go's Object Hash Mapper.
+
+Gohm is a Go port of the popular Ruby [Ohm](https://github.com/soveran/ohm) library, it provides a simple interface to store and retrieve your model data in a Redis database.
+
+## The Basics
+
+
+```golang
+package main
+
+import(
+  "github.com/pote/gohm"
+)
+
+var Gohm gohm.Gohm = gohm.NewDefaultGohm()
+
+type User struct{
+	ID    string `ohm:"id"`
+	Name  string `ohm:"name"`
+	Email string `ohm:"email"`
+}
+
+func main() {
+	u := &User{
+		Name: "Marty",
+		Email: "marty@mcfly.com",
+	}
+
+	Gohm.Save(u)
+
+	u.ID //=> "1"
+
+  u2 := &User{ID: "1"}
+  Gohm.Load(u2)
+
+  u2.Name //=> "Marty"
+}
+```
+
+## Ohm compatibility
+
+Both Ohm and Gohm are powered by [ohm-scripts](https://github.com/soveran/ohm-scripts), a set of Lua scripts that bundle common operations and make it easy to write a port such as this one, it also means that by adhering to the ohm standard **models stored with Gohm can be loaded from Ohm, and vice-versa**.
