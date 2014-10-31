@@ -1,28 +1,32 @@
 package gohm
 
 import(
+	"github.com/pote/redisurl"
 	"testing"
 )
 
 type User struct {
-	id    string `ohm:"id"`
+	ID    string
 	Name  string `ohm:"name"`
 	Email string `ohm:"email"`
 }
 
-func (u *User) ID() string {
-	return u.id
+func dbCleanup() {
+	conn, _ := redisurl.Connect()
+
+	conn.Do("SCRIPT FLUSH")
+	conn.Do("FLUSHDB")
+	conn.Close()
 }
 
+
 func TestSave(t *testing.T) {
+	dbCleanup()
+	defer dbCleanup()
 	Gohm, err := NewDefaultGohm()
 	if err != nil {
 		t.Error(err)
 	}
-	cleanupConn := Gohm.RedisPool.Get()
-	defer cleanupConn.Do("SCRIPT FLUSH")
-	defer cleanupConn.Do("FLUSHDB")
-	defer cleanupConn.Close()
 
 	user := &User{
 		Name: "Marty",
@@ -32,5 +36,9 @@ func TestSave(t *testing.T) {
 	err = Gohm.Save(user)
 	if err != nil {
 		t.Error(err)
+	}
+
+	if user.ID != "1" {
+		t.Errorf("id is not set: %v", user.ID)
 	}
 }

@@ -1,6 +1,7 @@
 package gohm
 
 import(
+	"errors"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pote/go-msgpack"
 	"github.com/pote/redisurl"
@@ -157,7 +158,7 @@ return tostring(model.id)
 	return g
 }
 
-func (g *gohm) Save(model Model, indices... string) (err error) {
+func (g *gohm) Save(model Model, indices... string) (error) {
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
 
@@ -165,8 +166,13 @@ func (g *gohm) Save(model Model, indices... string) (err error) {
 	features := map[string]string{
 		"name": modelType.Name(),
 	}
-	if model.ID() != "" {
-		features["id"] = string(model.ID())
+
+	_, ok := modelType.FieldByName("ID")
+	if !ok {
+		return errors.New("struct does not have ID field")
+	}
+	if modelData.FieldByName("ID").String() != "" {
+		features["id"] = modelData.FieldByName("ID").String()
 	}
 	ohmFeatures, err := msgpack.Marshal(features)
 	if err != nil {
@@ -206,11 +212,15 @@ func (g *gohm) Save(model Model, indices... string) (err error) {
 
 	conn := g.RedisPool.Get()
 	defer conn.Close()
-	_, err =  g.LuaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques)
+	id, err :=  redis.String(g.LuaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques))
+	if err != nil {
+		return err
+	}
 
-	return err
+	modelData.FieldByName("ID").SetString(id)
+
+	return nil
 }
 
 type Model interface {
-	ID() (string)
 }
