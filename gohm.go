@@ -41,7 +41,7 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
 
-	// Prepare Ohm-scripts `attributes` parameter
+	// Prepare Ohm-scripts `attributes` parameter.
 	attrs := []string{}
 	for i := 0; i < modelData.NumField(); i++ {
 		field := modelType.Field(i)
@@ -63,7 +63,7 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 		return err
 	}
 
-	// Prepare Ohm-scripts `features` parameter
+	// Prepare Ohm-scripts `features` parameter.
 	features := map[string]string{
 		"name": modelType.Name(),
 	}
@@ -76,14 +76,14 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 	}
 
 	// TODO
-	// Prepare Ohm-scripts `indices` parameter
+	// Prepare Ohm-scripts `indices` parameter.
 	ohmIndices, err := msgpack.Marshal(&map[string]string{})
 	if err != nil {
 		return err
 	}
 
 	// TODO
-	// Prepare Ohm-scripts `uniques` parameter
+	// Prepare Ohm-scripts `uniques` parameter.
 	ohmUniques, err := msgpack.Marshal(&map[string]string{})
 	if err != nil {
 		return err
@@ -96,10 +96,42 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 		return err
 	}
 
-	modelData.FieldByName("ID").SetString(id)
+	modelData.FieldByName(ModelIDFieldName(model)).SetString(id)
 
 	return nil
 }
 
-func (g *gohm) Find(id string, model interface{}) {
+func (g *gohm) Find(id string, model interface{}) (err error) {
+	if err := ValidateModel(model); err != nil {
+		return err
+	}
+
+	conn := g.RedisPool.Get()
+	defer conn.Close()
+	modelData := reflect.ValueOf(model).Elem()
+	modelType := modelData.Type()
+
+	idFieldName := ModelIDFieldName(model)
+	modelData.FieldByName(idFieldName).SetString(id)
+
+
+	attrs, err := redis.Strings(conn.Do("HGETALL", ModelKey(model)))
+	if err != nil {
+		return
+	}
+
+	attrIndexMap := ModelAttrIndexMap(model)
+	for i := 0; i < len(attrs); i = i + 2 {
+		attrName := attrs[i]
+		attrValue := attrs[i + 1]
+		attrIndex := attrIndexMap[attrName]
+
+		if ModelHasAttribute(model, attrName) {
+			attrValueValue := reflect.ValueOf(attrValue)
+			typedAttrValue := attrValueValue.Convert(modelType.Field(attrIndex).Type)
+			modelData.Field(attrIndex).Set(typedAttrValue)
+		}
+	}
+
+	return
 }
