@@ -27,25 +27,25 @@ type nonStringIDModel struct {
 
 func TestValidateModel(t *testing.T) {
 	var err error
-	if err = ValidateModel(&validModel{}); err != nil {
+	if err = validateModel(&validModel{}); err != nil {
 		t.Error(err)
 	}
 
-	if err = ValidateModel(&unexportedFieldModel{}); err != NonExportedAttrError {
+	if err = validateModel(&unexportedFieldModel{}); err != NonExportedAttrError {
 		t.Error(`unexported fields with ohm tags should make the model invalid`)
 	}
 
-	if err = ValidateModel(&noIDModel{}); err != NoIDError {
+	if err = validateModel(&noIDModel{}); err != NoIDError {
 		t.Error(`models with no ohm:"id" tag should be invalid`)
 	}
 
-	if err = ValidateModel(&nonStringIDModel{}); err != NonStringIDError {
+	if err = validateModel(&nonStringIDModel{}); err != NonStringIDError {
 		t.Error(`models should be invalid when their ohm:"id" field is not a string`)
 	}
 }
 
 func TestModelAttrIndexMap(t *testing.T) {
-	attrMap := ModelAttrIndexMap(&validModel{})
+	attrMap := modelAttrIndexMap(&validModel{})
 
 	expectedMap := map[string]int{
 		`name`:  1,
@@ -62,33 +62,33 @@ func TestModelID(t *testing.T) {
 	u := &validModel{}
 	u2 := &validModel{ID: `2`}
 
-	if ModelID(u) != `` {
-		t.Errorf(`expected model ID to be empty, but its set to "%v"`, ModelID(u))
+	if modelID(u) != `` {
+		t.Errorf(`expected model ID to be empty, but its set to "%v"`, modelID(u))
 	}
 
-	if ModelID(u2) != `2` {
-		t.Errorf(`model ID should be 2, but its "%v"`, ModelID(u))
+	if modelID(u2) != `2` {
+		t.Errorf(`model ID should be 2, but its "%v"`, modelID(u))
 	}
 }
 
 func TestModelHasAttribute(t *testing.T) {
-	if !ModelHasAttribute(&validModel{}, `email`) {
+	if !modelHasAttribute(&validModel{}, `email`) {
 		t.Error(`model has attribute "email", but the function return false`)
 	}
 
-	if ModelHasAttribute(&validModel{}, `palangana`) {
+	if modelHasAttribute(&validModel{}, `palangana`) {
 		t.Error(`model doesnt have the attribute "palangana", but the function return true`)
 	}
 }
 
 func TestModelIDFieldName(t *testing.T) {
-	if ModelIDFieldName(&validModel{}) != `ID` {
+	if modelIDFieldName(&validModel{}) != `ID` {
 		t.Error(`function is not correctly reporting the ID field name`)
 	}
 }
 
 func TestModelType(t *testing.T) {
-	if ModelType(&validModel{}) != `validModel` {
+	if modelType(&validModel{}) != `validModel` {
 		t.Error(`function does not return correct model name`)
 	}
 }

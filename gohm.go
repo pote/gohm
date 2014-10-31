@@ -33,7 +33,7 @@ func NewGohm(r *redis.Pool) (*gohm) {
 }
 
 func (g *gohm) Save(model interface{}) (error) {
-	if err := ValidateModel(model); err != nil {
+	if err := validateModel(model); err != nil {
 		return err
 	}
 
@@ -44,8 +44,8 @@ func (g *gohm) Save(model interface{}) (error) {
 	features := map[string]string{
 		"name": modelType.Name(),
 	}
-	if ModelID(model) != "" {
-		features["id"] = ModelID(model)
+	if modelID(model) != "" {
+		features["id"] = modelID(model)
 	}
 	ohmFeatures, err := msgpack.Marshal(features)
 	if err != nil {
@@ -54,7 +54,7 @@ func (g *gohm) Save(model interface{}) (error) {
 
 	// Prepare Ohm-scripts `attributes` parameter.
 	attrs := []string{}
-	attrIndexMap := ModelAttrIndexMap(model)
+	attrIndexMap := modelAttrIndexMap(model)
 	for attr, index := range attrIndexMap {
 		attrs = append(attrs, attr)
 		attrs = append(attrs, modelData.Field(index).String())
@@ -84,17 +84,17 @@ func (g *gohm) Save(model interface{}) (error) {
 	if err != nil {
 		return err
 	}
-	ModelSetID(id, model)
+	modelSetID(id, model)
 
 	return nil
 }
 
 func (g *gohm) Load(model interface{}) (err error) {
-	if err := ValidateModel(model); err != nil {
+	if err := validateModel(model); err != nil {
 		return err
 	}
 
-	if ModelID(model) == "" {
+	if modelID(model) == "" {
 		err = errors.New(`model does not have a set ohm:"id"`)
 		return
 	}
@@ -102,11 +102,11 @@ func (g *gohm) Load(model interface{}) (err error) {
 	conn := g.RedisPool.Get()
 	defer conn.Close()
 
-	attrs, err := redis.Strings(conn.Do("HGETALL", ModelKey(model)))
+	attrs, err := redis.Strings(conn.Do("HGETALL", modelKey(model)))
 	if err != nil {
 		return
 	}
-	ModelLoadAttrs(attrs, model)
+	modelLoadAttrs(attrs, model)
 
 	return
 }

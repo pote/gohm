@@ -16,7 +16,7 @@ var NonExportedAttrError error = errors.New(`can't put ohm tags in unexported fi
 // make sure you always run ValidateModel on your model, or you run a pretty
 // big risk of raising a panic: gohm uses *a lot* of reflection, which is very
 // prone to panics when the type received doesn't follow certain assumptions.
-func ValidateModel(model interface{}) error {
+func validateModel(model interface{}) error {
 	var hasID bool
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
@@ -46,7 +46,7 @@ func ValidateModel(model interface{}) error {
 	return nil
 }
 
-func ModelAttrIndexMap(model interface{}) (map[string]int) {
+func modelAttrIndexMap(model interface{}) (map[string]int) {
 	attrs := map[string]int{}
 	typeData := reflect.TypeOf(model).Elem()
 	for i := 0; i < typeData.NumField(); i++ {
@@ -60,22 +60,22 @@ func ModelAttrIndexMap(model interface{}) (map[string]int) {
 	return attrs
 }
 
-func ModelKey(model interface{}) (key string) {
-	key = fmt.Sprintf("%v:%v", ModelType(model), ModelID(model))
+func modelKey(model interface{}) (key string) {
+	key = fmt.Sprintf("%v:%v", modelType(model), modelID(model))
 
 	return
 }
 
-func ModelID(model interface{}) (id string) {
+func modelID(model interface{}) (id string) {
 	modelData := reflect.ValueOf(model).Elem()
-	idFieldName := ModelIDFieldName(model)
+	idFieldName := modelIDFieldName(model)
 	id = modelData.FieldByName(idFieldName).String()
 
 	return
 }
 
-func ModelHasAttribute(model interface{}, attribute string) bool {
-	attrIndexMap := ModelAttrIndexMap(model)
+func modelHasAttribute(model interface{}, attribute string) bool {
+	attrIndexMap := modelAttrIndexMap(model)
 	for attr, _ := range attrIndexMap {
 		if attribute == attr {
 			return true
@@ -85,7 +85,7 @@ func ModelHasAttribute(model interface{}, attribute string) bool {
 	return false
 }
 
-func ModelIDFieldName(model interface{}) (fieldName string) {
+func modelIDFieldName(model interface{}) (fieldName string) {
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
 
@@ -101,7 +101,7 @@ func ModelIDFieldName(model interface{}) (fieldName string) {
 	return
 }
 
-func ModelIndices(model interface{}) []int {
+func modelIndices(model interface{}) []int {
 	indices := []int{}
 
 	typeData := reflect.TypeOf(model).Elem()
@@ -116,7 +116,7 @@ func ModelIndices(model interface{}) []int {
 	return indices
 }
 
-func ModelUniques(model interface{}) []int {
+func modelUniques(model interface{}) []int {
 	uniques := []int{}
 
 	typeData := reflect.TypeOf(model).Elem()
@@ -131,24 +131,24 @@ func ModelUniques(model interface{}) []int {
 	return uniques
 }
 
-func ModelSetID(id string, model interface{}) {
-	reflect.ValueOf(model).Elem().FieldByName(ModelIDFieldName(model)).SetString(id)
+func modelSetID(id string, model interface{}) {
+	reflect.ValueOf(model).Elem().FieldByName(modelIDFieldName(model)).SetString(id)
 }
 
-func ModelType(model interface{}) string {
+func modelType(model interface{}) string {
 	return reflect.TypeOf(model).Elem().Name()
 }
 
-func ModelLoadAttrs(attrs []string, model interface{}) {
+func modelLoadAttrs(attrs []string, model interface{}) {
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
-	attrIndexMap := ModelAttrIndexMap(model)
+	attrIndexMap := modelAttrIndexMap(model)
 	for i := 0; i < len(attrs); i = i + 2 {
 		attrName := attrs[i]
 		attrValue := attrs[i + 1]
 		attrIndex := attrIndexMap[attrName]
 
-		if ModelHasAttribute(model, attrName) {
+		if modelHasAttribute(model, attrName) {
 			attrValueValue := reflect.ValueOf(attrValue)
 			typedAttrValue := attrValueValue.Convert(modelType.Field(attrIndex).Type)
 			modelData.Field(attrIndex).Set(typedAttrValue)
