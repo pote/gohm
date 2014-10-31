@@ -4,6 +4,7 @@ import(
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var NoStructError error = errors.New(`model is not a struct`)
@@ -46,7 +47,7 @@ func ModelAttrIndexMap(model interface{}) (map[string]int) {
 	for i := 0; i < typeData.NumField(); i++ {
 		field := typeData.Field(i)
 		tag := field.Tag.Get(`ohm`)
-		if tag != `` && tag != `-` {
+		if tag != `` && tag != `-` && tag != "id" {
 			attrs[tag] = i
 		}
 	}
@@ -94,4 +95,38 @@ func ModelIDFieldName(model interface{}) (fieldName string) {
 	}
 
 	return
+}
+
+func ModelIndices(model interface{}) []int {
+	indices := []int{}
+
+	typeData := reflect.TypeOf(model).Elem()
+	for i := 0; i < typeData.NumField(); i++ {
+		field := typeData.Field(i)
+		tag := field.Tag.Get(`ohm`)
+		if strings.Contains(tag, `index`) {
+			indices = append(indices, i)
+		}
+	}
+
+	return indices
+}
+
+func ModelUniques(model interface{}) []int {
+	uniques := []int{}
+
+	typeData := reflect.TypeOf(model).Elem()
+	for i := 0; i < typeData.NumField(); i++ {
+		field := typeData.Field(i)
+		tag := field.Tag.Get(`ohm`)
+		if strings.Contains(tag, `unique`) {
+			uniques = append(uniques, i)
+		}
+	}
+
+	return uniques
+}
+
+func ModelSetID(id string, model interface{}) {
+	reflect.ValueOf(model).Elem().FieldByName(ModelIDFieldName(model)).SetString(id)
 }

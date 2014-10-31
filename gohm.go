@@ -31,12 +31,11 @@ func NewGohm(r *redis.Pool) (*gohm) {
 	return g
 }
 
-func (g *gohm) Save(model interface{}, indices... string) (error) {
+func (g *gohm) Save(model interface{}) (error) {
 	if err := ValidateModel(model); err != nil {
 		return err
 	}
 
-	var hasID bool
 	var idFieldIndex int
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
@@ -46,11 +45,6 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 	for i := 0; i < modelData.NumField(); i++ {
 		field := modelType.Field(i)
 		tag := field.Tag.Get("ohm")
-		if !hasID && tag == "id" {
-			hasID = true
-			idFieldIndex = i
-			continue
-		}
 		if tag == "" || tag == "-" {
 			continue
 		}
@@ -95,8 +89,7 @@ func (g *gohm) Save(model interface{}, indices... string) (error) {
 	if err != nil {
 		return err
 	}
-
-	modelData.FieldByName(ModelIDFieldName(model)).SetString(id)
+	ModelSetID(id, model)
 
 	return nil
 }
@@ -108,18 +101,15 @@ func (g *gohm) Find(id string, model interface{}) (err error) {
 
 	conn := g.RedisPool.Get()
 	defer conn.Close()
-	modelData := reflect.ValueOf(model).Elem()
-	modelType := modelData.Type()
-
-	idFieldName := ModelIDFieldName(model)
-	modelData.FieldByName(idFieldName).SetString(id)
-
+	ModelSetID(id, model)
 
 	attrs, err := redis.Strings(conn.Do("HGETALL", ModelKey(model)))
 	if err != nil {
 		return
 	}
 
+	modelData := reflect.ValueOf(model).Elem()
+	modelType := modelData.Type()
 	attrIndexMap := ModelAttrIndexMap(model)
 	for i := 0; i < len(attrs); i = i + 2 {
 		attrName := attrs[i]
