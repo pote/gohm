@@ -1,6 +1,7 @@
 package gohm
 
 import(
+	"errors"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pote/go-msgpack"
 	"github.com/pote/redisurl"
@@ -88,34 +89,24 @@ func (g *gohm) Save(model interface{}) (error) {
 	return nil
 }
 
-func (g *gohm) Find(id string, model interface{}) (err error) {
+func (g *gohm) Load(model interface{}) (err error) {
 	if err := ValidateModel(model); err != nil {
 		return err
 	}
 
+	if ModelID(model) == "" {
+		err = errors.New(`model does not have a set ohm:"id"`)
+		return
+	}
+
 	conn := g.RedisPool.Get()
 	defer conn.Close()
-	ModelSetID(id, model)
 
 	attrs, err := redis.Strings(conn.Do("HGETALL", ModelKey(model)))
 	if err != nil {
 		return
 	}
-
-	modelData := reflect.ValueOf(model).Elem()
-	modelType := modelData.Type()
-	attrIndexMap := ModelAttrIndexMap(model)
-	for i := 0; i < len(attrs); i = i + 2 {
-		attrName := attrs[i]
-		attrValue := attrs[i + 1]
-		attrIndex := attrIndexMap[attrName]
-
-		if ModelHasAttribute(model, attrName) {
-			attrValueValue := reflect.ValueOf(attrValue)
-			typedAttrValue := attrValueValue.Convert(modelType.Field(attrIndex).Type)
-			modelData.Field(attrIndex).Set(typedAttrValue)
-		}
-	}
+	ModelLoadAttrs(attrs, model)
 
 	return
 }

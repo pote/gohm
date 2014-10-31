@@ -43,7 +43,7 @@ func TestSaveLoadsID(t *testing.T) {
 	}
 }
 
-func TestFindStruct(t *testing.T) {
+func TestLoad(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
 	Gohm, _ := NewDefaultGohm()
@@ -52,8 +52,8 @@ func TestFindStruct(t *testing.T) {
 		Email: `marty@mcfly.com`,
 	})
 
-	var u user
-	err := Gohm.Find(`1`, &u)
+	u := &user{ID: `1`}
+	err := Gohm.Load(u)
 	if err != nil {
 		t.Error(err)
 	}

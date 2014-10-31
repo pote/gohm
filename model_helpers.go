@@ -138,3 +138,20 @@ func ModelSetID(id string, model interface{}) {
 func ModelType(model interface{}) string {
 	return reflect.TypeOf(model).Elem().Name()
 }
+
+func ModelLoadAttrs(attrs []string, model interface{}) {
+	modelData := reflect.ValueOf(model).Elem()
+	modelType := modelData.Type()
+	attrIndexMap := ModelAttrIndexMap(model)
+	for i := 0; i < len(attrs); i = i + 2 {
+		attrName := attrs[i]
+		attrValue := attrs[i + 1]
+		attrIndex := attrIndexMap[attrName]
+
+		if ModelHasAttribute(model, attrName) {
+			attrValueValue := reflect.ValueOf(attrValue)
+			typedAttrValue := attrValueValue.Convert(modelType.Field(attrIndex).Type)
+			modelData.Field(attrIndex).Set(typedAttrValue)
+		}
+	}
+}
