@@ -36,35 +36,29 @@ func (g *gohm) Save(model interface{}) (error) {
 		return err
 	}
 
-	var idFieldIndex int
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
-
-	// Prepare Ohm-scripts `attributes` parameter.
-	attrs := []string{}
-	for i := 0; i < modelData.NumField(); i++ {
-		field := modelType.Field(i)
-		tag := field.Tag.Get("ohm")
-		if tag == "" || tag == "-" {
-			continue
-		}
-
-		attrs = append(attrs, tag)
-		attrs = append(attrs, modelData.Field(i).String())
-	}
-	ohmAttrs, err := msgpack.Marshal(attrs)
-	if err != nil {
-		return err
-	}
 
 	// Prepare Ohm-scripts `features` parameter.
 	features := map[string]string{
 		"name": modelType.Name(),
 	}
-	if modelData.Field(idFieldIndex).String() != "" {
-		features["id"] = modelData.FieldByName("ID").String()
+	if ModelID(model) != "" {
+		features["id"] = ModelID(model)
 	}
 	ohmFeatures, err := msgpack.Marshal(features)
+	if err != nil {
+		return err
+	}
+
+	// Prepare Ohm-scripts `attributes` parameter.
+	attrs := []string{}
+	attrIndexMap := ModelAttrIndexMap(model)
+	for attr, index := range attrIndexMap {
+		attrs = append(attrs, attr)
+		attrs = append(attrs, modelData.Field(index).String())
+	}
+	ohmAttrs, err := msgpack.Marshal(attrs)
 	if err != nil {
 		return err
 	}
