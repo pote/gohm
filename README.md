@@ -1,4 +1,4 @@
-# Gohm ॐ - Go's Object Hash Mapper.
+# Gohm ॐ - Go's Object Hash Mapper. ![build](https://travis-ci.org/pote/gohm.svg)
 
 Gohm is a Go port of the popular Ruby [Ohm](https://github.com/soveran/ohm) library, it provides a simple interface to store and retrieve your model data in a Redis database.
 
