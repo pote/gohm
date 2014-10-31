@@ -12,7 +12,6 @@ import(
   "github.com/pote/gohm"
 )
 
-var Gohm gohm.Gohm = gohm.NewDefaultGohm()
 
 type User struct{
 	ID    string `ohm:"id"`
@@ -21,6 +20,8 @@ type User struct{
 }
 
 func main() {
+  Gohm, _ := gohm.NewDefaultGohm()
+
 	u := &User{
 		Name: "Marty",
 		Email: "marty@mcfly.com",
