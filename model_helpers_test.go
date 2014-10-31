@@ -57,3 +57,16 @@ func TestModelAttrIndexMap(t *testing.T) {
 		t.Errorf(`expected %v, got %v`, expectedMap, attrMap)
 	}
 }
+
+func TestModelID(t *testing.T) {
+	u := &validModel{}
+	u2 := &validModel{ID: `2`}
+
+	if ModelID(u) != `` {
+		t.Errorf(`expected model ID to be empty, but its set to "%v"`, ModelID(u))
+	}
+
+	if ModelID(u2) != `2` {
+		t.Errorf(`model ID should be 2, but its "%v"`, ModelID(u))
+	}
+}
