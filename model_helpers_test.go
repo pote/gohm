@@ -70,3 +70,13 @@ func TestModelID(t *testing.T) {
 		t.Errorf(`model ID should be 2, but its "%v"`, ModelID(u))
 	}
 }
+
+func TestModelHasAttribute(t *testing.T) {
+	if !ModelHasAttribute(&validModel{}, `email`) {
+		t.Error(`model has attribute "email", but the function return false`)
+	}
+
+	if ModelHasAttribute(&validModel{}, `palangana`) {
+		t.Error(`model doesnt have the attribute "palangana", but the function return true`)
+	}
+}
