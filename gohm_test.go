@@ -62,7 +62,12 @@ func TestLoad(t *testing.T) {
 		t.Errorf(`id not correctly set in model (expected "1", was "%v")`, u.ID)
 	}
 
-	if u.Name != "Marty" {
+	if u.Name != `Marty` {
 		t.Errorf(`incorrect Name set (expected "Marty", got "%v")`, u.Name)
+	}
+
+	u2 := &user{}
+	if err = Gohm.Load(u2); err == nil {
+		t.Error(`Load should return an error when loading model without a set id`)
 	}
 }
