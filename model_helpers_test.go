@@ -80,3 +80,9 @@ func TestModelHasAttribute(t *testing.T) {
 		t.Error(`model doesnt have the attribute "palangana", but the function return true`)
 	}
 }
+
+func TestModelIDFieldName(t *testing.T) {
+	if ModelIDFieldName(&validModel{}) != `ID` {
+		t.Error(`function is not correctly reporting the ID field name`)
+	}
+}
