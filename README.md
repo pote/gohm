@@ -5,7 +5,7 @@ Gohm is a Go port of the popular Ruby [Ohm](https://github.com/soveran/ohm) libr
 ## The Basics
 
 
-```golang
+```go
 package main
 
 import(
