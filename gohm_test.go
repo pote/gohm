@@ -6,7 +6,7 @@ import(
 )
 
 type User struct {
-	ID    string
+	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
 	Email string `ohm:"email"`
 }
@@ -19,8 +19,7 @@ func dbCleanup() {
 	conn.Close()
 }
 
-
-func TestSave(t *testing.T) {
+func TestSaveLoadsID(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
 	Gohm, err := NewDefaultGohm()
@@ -40,5 +39,23 @@ func TestSave(t *testing.T) {
 
 	if user.ID != "1" {
 		t.Errorf("id is not set: %v", user.ID)
+	}
+}
+
+func TestFindStruct(t *testing.T) {
+	dbCleanup()
+	defer dbCleanup()
+	Gohm, _ := NewDefaultGohm()
+	Gohm.Save(&User{
+		Name: "Marty",
+		Email: "marty@mcfly.com",
+	})
+
+
+	var user User
+	Gohm.Find("1", user)
+
+	if user.Name != "Marty" {
+		t.Errorf("incorrect Name set: %v", user.Name)
 	}
 }
