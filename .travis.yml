@@ -1,14 +1,13 @@
 language: go
 
 go:
-  - 1.0
   - 1.1
   - 1.2
   - 1.3
   - tip
 
-env:
-  - DB=redis
+services:
+  - redis-server
 
 install: "go get"
 script: "make test"
