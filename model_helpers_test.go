@@ -86,3 +86,9 @@ func TestModelIDFieldName(t *testing.T) {
 		t.Error(`function is not correctly reporting the ID field name`)
 	}
 }
+
+func TestModelType(t *testing.T) {
+	if ModelType(&validModel{}) != `validModel` {
+		t.Error(`function does not return correct model name`)
+	}
+}
