@@ -56,8 +56,7 @@ func ModelAttrIndexMap(model interface{}) (map[string]int) {
 }
 
 func ModelKey(model interface{}) (key string) {
-	modelType := reflect.TypeOf(model).Elem()
-	key = fmt.Sprintf("%v:%v", modelType.Name(), ModelID(model))
+	key = fmt.Sprintf("%v:%v", ModelType(model), ModelID(model))
 
 	return
 }
@@ -129,4 +128,8 @@ func ModelUniques(model interface{}) []int {
 
 func ModelSetID(id string, model interface{}) {
 	reflect.ValueOf(model).Elem().FieldByName(ModelIDFieldName(model)).SetString(id)
+}
+
+func ModelType(model interface{}) string {
+	return reflect.TypeOf(model).Elem().Name()
 }

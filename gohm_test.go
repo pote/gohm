@@ -5,7 +5,7 @@ import(
 	`testing`
 )
 
-type User struct {
+type user struct {
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
 	UUID  string `ohm:"name unique"`
@@ -28,18 +28,18 @@ func TestSaveLoadsID(t *testing.T) {
 		t.Error(err)
 	}
 
-	user := &User{
+	u := &user{
 		Name: `Marty`,
 		Email: `marty@mcfly.com`,
 	}
 
-	err = Gohm.Save(user)
+	err = Gohm.Save(u)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if user.ID != `1` {
-		t.Errorf(`id is not set (expected "1", got "%v")`, user.ID)
+	if u.ID != `1` {
+		t.Errorf(`id is not set (expected "1", got "%v")`, u.ID)
 	}
 }
 
@@ -47,22 +47,22 @@ func TestFindStruct(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
 	Gohm, _ := NewDefaultGohm()
-	Gohm.Save(&User{
+	Gohm.Save(&user{
 		Name: `Marty`,
 		Email: `marty@mcfly.com`,
 	})
 
-	var user User
-	err := Gohm.Find(`1`, &user)
+	var u user
+	err := Gohm.Find(`1`, &u)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if user.ID != `1` {
-		t.Errorf(`id not correctly set in model (expected "1", was "%v")`, user.ID)
+	if u.ID != `1` {
+		t.Errorf(`id not correctly set in model (expected "1", was "%v")`, u.ID)
 	}
 
-	if user.Name != "Marty" {
-		t.Errorf(`incorrect Name set (expected "Marty", got "%v")`, user.Name)
+	if u.Name != "Marty" {
+		t.Errorf(`incorrect Name set (expected "Marty", got "%v")`, u.Name)
 	}
 }
