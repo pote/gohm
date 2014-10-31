@@ -12,7 +12,6 @@ import(
   "github.com/pote/gohm"
 )
 
-
 type User struct{
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
