@@ -11,12 +11,17 @@ type validModel struct {
 	UUID  string `ohm:"name unique"`
 }
 
-type unexporedFieldModel struct {
+type unexportedFieldModel struct {
 	ID   string `ohm:"id"`
 	name string `ohm:"name"`
 }
+
 type noIDModel struct {
 	Name string `ohm:"name"`
+}
+
+type nonStringIDModel struct {
+	Name int `ohm:"name"`
 }
 
 func TestValidateModel(t *testing.T) {
@@ -25,4 +30,15 @@ func TestValidateModel(t *testing.T) {
 		t.Error(err)
 	}
 
+	if err = ValidateModel(&unexportedFieldModel{}); err != NonExportedAttrError {
+		t.Error(`unexported fields with ohm tags should make the model invalid`)
+	}
+
+	if err = ValidateModel(&noIDModel{}); err != NoIDError {
+		t.Error(`models with no ohm:"id" tag should be invalid`)
+	}
+
+	if err = ValidateModel(&nonStringIDModel{}); err != NonStringIDError {
+		t.Error(`models should be invalid when their ohm:"id" field is not a string`)
+	}
 }

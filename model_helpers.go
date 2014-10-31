@@ -9,6 +9,7 @@ import(
 
 var NoStructError error = errors.New(`model is not a struct`)
 var NoIDError error = errors.New(`model does not have an ohm:"id" tagged field`)
+var NonStringIDError error = errors.New(`model's ohm:"id" field is not a string`)
 var NonExportedAttrError error = errors.New(`can't put ohm tags in unexported fields`)
 
 // If you plan on calling any of the Model helpers available in this package
@@ -31,6 +32,10 @@ func ValidateModel(model interface{}) error {
 
 		if modelType.Field(i).Tag.Get(`ohm`) == `id` {
 			hasID = true
+		}
+
+		if modelType.Field(i).Type.Name() != `string` {
+			return NonStringIDError
 		}
 	}
 
