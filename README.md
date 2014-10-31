@@ -19,21 +19,21 @@ type User struct{
 }
 
 func main() {
-  Gohm, _ := gohm.NewDefaultGohm()
+ 	Gohm, _ := gohm.NewDefaultGohm()
 
-	u := &User{
-		Name: "Marty",
+  	u := &User{
+  		Name: "Marty",
 		Email: "marty@mcfly.com",
-	}
+  	}
 
-	Gohm.Save(u)
+  	Gohm.Save(u)
 
-	u.ID //=> "1"
+  	u.ID //=> "1"
 
-  u2 := &User{ID: "1"}
-  Gohm.Load(u2)
+  	u2 := &User{ID: "1"}
+  	Gohm.Load(u2)
 
-  u2.Name //=> "Marty"
+  	u2.Name //=> "Marty"
 }
 ```
 
