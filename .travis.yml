@@ -10,4 +10,5 @@ go:
 env:
   - DB=redis
 
+install: "go get"
 script: "make test"
