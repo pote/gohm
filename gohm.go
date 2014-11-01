@@ -8,23 +8,27 @@ import(
 	"reflect"
 )
 
-type gohm struct {
+type Gohm struct {
 	RedisPool *redis.Pool
 	LuaSave   *redis.Script
 }
 
-func NewDefaultGohm() (*gohm, error) {
-	pool, err := redisurl.NewPool(3, 200, "240s")
-	if err != nil {
-		return nil, err
-	}
+func NewGohm(r... *redis.Pool) (*Gohm, error) {
+	if len(r) < 1 {
+		pool, err := redisurl.NewPool(3, 200, "240s")
+		if err != nil {
+			return &Gohm{}, err
+		}	
 
-	return NewGohm(pool), nil
+		return NewGohmWithPool(pool), nil
+	} else {
+		return NewGohmWithPool(r[0]), nil
+	}
 }
 
-func NewGohm(r *redis.Pool) (*gohm) {
-	g := &gohm{
-		RedisPool: r,
+func NewGohmWithPool(pool *redis.Pool) *Gohm {
+	g := &Gohm{
+		RedisPool: pool,
 	}
 
 	g.LuaSave = redis.NewScript(0, LUA_SAVE)
@@ -32,7 +36,7 @@ func NewGohm(r *redis.Pool) (*gohm) {
 	return g
 }
 
-func (g *gohm) Save(model interface{}) (error) {
+func (g *Gohm) Save(model interface{}) (error) {
 	if err := validateModel(model); err != nil {
 		return err
 	}
@@ -89,7 +93,7 @@ func (g *gohm) Save(model interface{}) (error) {
 	return nil
 }
 
-func (g *gohm) Load(model interface{}) (err error) {
+func (g *Gohm) Load(model interface{}) (err error) {
 	if err := validateModel(model); err != nil {
 		return err
 	}

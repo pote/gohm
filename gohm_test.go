@@ -6,10 +6,11 @@ import(
 )
 
 type user struct {
-	ID    string `ohm:"id"`
-	Name  string `ohm:"name"`
-	Email string `ohm:"email index"`
-	UUID  string `ohm:"uuid unique"`
+	ID      string `ohm:"id"`
+	Name    string `ohm:"name"`
+	Email   string `ohm:"email index"`
+	UUID    string `ohm:"uuid unique"`
+	//Friends []user `ohm:"collection"`
 }
 
 func dbCleanup() {
@@ -23,7 +24,7 @@ func dbCleanup() {
 func TestSaveLoadsID(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
-	Gohm, err := NewDefaultGohm()
+	gohm, err := NewGohm()
 	if err != nil {
 		t.Error(err)
 	}
@@ -33,7 +34,7 @@ func TestSaveLoadsID(t *testing.T) {
 		Email: `marty@mcfly.com`,
 	}
 
-	err = Gohm.Save(u)
+	err = gohm.Save(u)
 	if err != nil {
 		t.Error(err)
 	}
@@ -46,14 +47,14 @@ func TestSaveLoadsID(t *testing.T) {
 func TestLoad(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
-	Gohm, _ := NewDefaultGohm()
-	Gohm.Save(&user{
+	gohm, _ := NewGohm()
+	gohm.Save(&user{
 		Name: `Marty`,
 		Email: `marty@mcfly.com`,
 	})
 
 	u := &user{ID: `1`}
-	err := Gohm.Load(u)
+	err := gohm.Load(u)
 	if err != nil {
 		t.Error(err)
 	}
@@ -67,7 +68,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	u2 := &user{}
-	if err = Gohm.Load(u2); err == nil {
+	if err = gohm.Load(u2); err == nil {
 		t.Error(`Load should return an error when loading model without a set id`)
 	}
 }
