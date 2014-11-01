@@ -19,7 +19,7 @@ type User struct{
 }
 
 func main() {
- 	Gohm, _ := gohm.NewDefaultGohm()
+ 	Gohm, _ := gohm.NewGohm()
 
   	u := &User{
   		Name: "Marty",
