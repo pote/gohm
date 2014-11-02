@@ -110,6 +110,10 @@ func (g *Gohm) Load(model interface{}) (err error) {
 	if err != nil {
 		return
 	}
+	if len(attrs) == 0 {
+		err = errors.New(`Couldn't find "` + modelKey(model) + `" in redis`)
+		return
+	}
 	modelLoadAttrs(attrs, model)
 
 	return
