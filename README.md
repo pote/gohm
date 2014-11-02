@@ -1,6 +1,6 @@
 # Gohm ॐ ![build](https://travis-ci.org/pote/gohm.svg)
 
-Gohm is a Go port of the popular Ruby [Ohm](https://github.com/soveran/ohm) library, it provides a simple interface to store and retrieve your model data in a Redis database.
+Gohm is a Go port of the popular [Ohm](https://github.com/soveran/ohm) Ruby library, it provides a simple interface to store and retrieve your model data in a Redis database.
 
 ## The Basics
 
@@ -21,17 +21,17 @@ type User struct{
 func main() {
  	Gohm, _ := gohm.NewGohm()
 
-  	u := &User{
+  	u := User{
   		Name: "Marty",
 		Email: "marty@mcfly.com",
   	}
 
-  	Gohm.Save(u)
+  	Gohm.Save(&u)
 
   	u.ID //=> "1"
 
-  	u2 := &User{ID: "1"}
-  	Gohm.Load(u2)
+  	u2 := User{ID: "1"}
+  	Gohm.Load(&u2)
 
   	u2.Name //=> "Marty"
 }
