@@ -2,6 +2,8 @@
 
 Gohm is a Go port of the popular [Ohm](https://github.com/soveran/ohm) Ruby library, it provides a simple interface to store and retrieve your model data in a Redis database.
 
+Gohm implements nothing but the basic usage right now, but expect all or most features in Ohm to be implemented into Gohm as time goes by, contributions are very welcome. :) 
+
 ## The Basics
 
 
