@@ -24,7 +24,7 @@ func dbCleanup() {
 func TestSaveLoadsID(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
-	gohm, err := NewGohm()
+	gohm, err := NewConnection()
 	if err != nil {
 		t.Error(err)
 	}
@@ -47,7 +47,7 @@ func TestSaveLoadsID(t *testing.T) {
 func TestLoad(t *testing.T) {
 	dbCleanup()
 	defer dbCleanup()
-	gohm, _ := NewGohm()
+	gohm, _ := NewConnection()
 	gohm.Save(&user{
 		Name: `Marty`,
 		Email: `marty@mcfly.com`,
@@ -79,7 +79,7 @@ func TestLoadInvalidID(t *testing.T) {
 
 	u := &user{ID: `1000000`}
 
-	gohm, _ := NewGohm()
+	gohm, _ := NewConnection()
 
 	err := gohm.Load(u)
 	if err == nil {

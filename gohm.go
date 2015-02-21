@@ -8,35 +8,36 @@ import(
 	"reflect"
 )
 
-type Gohm struct {
+type Connection struct {
 	RedisPool *redis.Pool
-	LuaSave   *redis.Script
+	luaSave   *redis.Script
 }
 
-func NewGohm(r... *redis.Pool) (*Gohm, error) {
+func NewConnection(r... *redis.Pool) (*Connection, error) {
 	if len(r) < 1 {
 		pool, err := redisurl.NewPool(3, 200, "240s")
 		if err != nil {
-			return &Gohm{}, err
+			return &Connection{}, err
 		}	
 
-		return NewGohmWithPool(pool), nil
+  return NewConnectionWithPool(pool), nil
 	} else {
-		return NewGohmWithPool(r[0]), nil
+    return NewConnectionWithPool(r[0]), nil
 	}
+
 }
 
-func NewGohmWithPool(pool *redis.Pool) *Gohm {
-	g := &Gohm{
+func NewConnectionWithPool(pool *redis.Pool) *Connection {
+	c := &Connection{
 		RedisPool: pool,
 	}
 
-	g.LuaSave = redis.NewScript(0, LUA_SAVE)
+	c.luaSave = redis.NewScript(0, LUA_SAVE)
 
-	return g
+	return c
 }
 
-func (g *Gohm) Save(model interface{}) (error) {
+func (c *Connection) Save(model interface{}) (error) {
 	if err := validateModel(model); err != nil {
 		return err
 	}
@@ -81,9 +82,9 @@ func (g *Gohm) Save(model interface{}) (error) {
 		return err
 	}
 
-	conn := g.RedisPool.Get()
+	conn := c.RedisPool.Get()
 	defer conn.Close()
-	id, err :=  redis.String(g.LuaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques))
+	id, err :=  redis.String(c.luaSave.Do(conn, ohmFeatures, ohmAttrs, ohmIndices, ohmUniques))
 	if err != nil {
 		return err
 	}
@@ -92,7 +93,7 @@ func (g *Gohm) Save(model interface{}) (error) {
 	return nil
 }
 
-func (g *Gohm) Load(model interface{}) (err error) {
+func (c *Connection) Load(model interface{}) (err error) {
 	if err := validateModel(model); err != nil {
 		return err
 	}
@@ -102,7 +103,7 @@ func (g *Gohm) Load(model interface{}) (err error) {
 		return
 	}
 
-	conn := g.RedisPool.Get()
+	conn := c.RedisPool.Get()
 	defer conn.Close()
 
 	attrs, err := redis.Strings(conn.Do("HGETALL", modelKey(model)))
