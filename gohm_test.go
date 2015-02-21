@@ -9,7 +9,7 @@ type user struct {
 	ID      string `ohm:"id"`
 	Name    string `ohm:"name"`
 	Email   string `ohm:"email index"`
-	UUID    string `ohm:"uuid unique"`
+	UUID    string `ohm:"uuid  unique"`
 	//Friends []user `ohm:"collection"`
 }
 

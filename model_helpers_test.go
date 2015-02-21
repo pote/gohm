@@ -9,7 +9,7 @@ type validModel struct {
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
 	Email string `ohm:"email index"`
-	UUID  string `ohm:"uuid unique"`
+	UUID  string `ohm:"uuid  unique"`
 }
 
 type unexportedFieldModel struct {
@@ -91,4 +91,18 @@ func TestModelType(t *testing.T) {
 	if modelType(&validModel{}) != `validModel` {
 		t.Error(`function does not return correct model name`)
 	}
+}
+
+func TestModelIndices(t *testing.T) {
+  u := validModel{Email: "pote@tardis.com.uy"}
+
+  indices := modelIndices(&u)
+  if len(indices) == 0 {
+    t.Error("there were indicices in the model but function didn't return them")
+    return
+  }
+
+  if indices["email"] != "pote@tardis.com.uy" {
+    t.Error("incorrect value for index")
+  }
 }

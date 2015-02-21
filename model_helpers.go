@@ -101,15 +101,18 @@ func modelIDFieldName(model interface{}) (fieldName string) {
 	return
 }
 
-func modelIndices(model interface{}) []int {
-	indices := []int{}
+func modelIndices(model interface{}) map[string]string {
+  indices := map[string]string{}
 
 	typeData := reflect.TypeOf(model).Elem()
+	modelData := reflect.ValueOf(model).Elem()
+
 	for i := 0; i < typeData.NumField(); i++ {
 		field := typeData.Field(i)
 		tag := field.Tag.Get(`ohm`)
 		if strings.Contains(tag, `index`) {
-			indices = append(indices, i)
+      name := strings.Split(tag, ` `)[0]
+			indices[name] = modelData.Field(i).String()
 		}
 	}
 
