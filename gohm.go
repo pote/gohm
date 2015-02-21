@@ -68,9 +68,8 @@ func (g *Gohm) Save(model interface{}) (error) {
 		return err
 	}
 
-	// TODO
 	// Prepare Ohm-scripts `indices` parameter.
-	ohmIndices, err := msgpack.Marshal(&map[string]string{})
+	ohmIndices, err := msgpack.Marshal(modelIndices(model))
 	if err != nil {
 		return err
 	}

@@ -102,7 +102,7 @@ func TestModelIndices(t *testing.T) {
     return
   }
 
-  if indices["email"] != "pote@tardis.com.uy" {
+  if indices["email"][0] != "pote@tardis.com.uy" {
     t.Error("incorrect value for index")
   }
 }
