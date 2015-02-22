@@ -13,7 +13,7 @@ Both Ohm and Gohm are powered by [ohm-scripts](https://github.com/soveran/ohm-sc
 Gohm models are simple Go structs which just need to adhere certain criteria, this is how a Gohm model might look like in code:
 
 ```go
-type user struct{
+type User struct{
 	ID    string `ohm:"id"`
 	Name  string `ohm:"name"`
 	Email string `ohm:"email"`

@@ -22,7 +22,7 @@ type noIDModel struct {
 }
 
 type nonStringIDModel struct {
-	Name int `ohm:"name"`
+	Name int `ohm:"id"`
 }
 
 func TestValidateModel(t *testing.T) {

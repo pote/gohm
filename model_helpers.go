@@ -17,12 +17,12 @@ var NonExportedAttrError error = errors.New(`can't put ohm tags in unexported fi
 // big risk of raising a panic: gohm uses *a lot* of reflection, which is very
 // prone to panics when the type received doesn't follow certain assumptions.
 func validateModel(model interface{}) error {
-	var hasID bool
+	var hasID bool = false
 	modelData := reflect.ValueOf(model).Elem()
 	modelType := modelData.Type()
 
 	if modelData.Kind().String() != `struct` {
-		return NoIDError
+		return NoStructError
 	}
 
 	for i := 0; i < modelData.NumField(); i++ {
@@ -32,11 +32,11 @@ func validateModel(model interface{}) error {
 
 		if modelType.Field(i).Tag.Get(`ohm`) == `id` {
 			hasID = true
-		}
 
-		if modelType.Field(i).Type.Name() != `string` {
-			return NonStringIDError
-		}
+      if modelType.Field(i).Type.Name() != `string` {
+        return NonStringIDError
+      }
+    }
 	}
 
 	if !hasID {
@@ -52,7 +52,7 @@ func modelAttrIndexMap(model interface{}) (map[string]int) {
 	for i := 0; i < typeData.NumField(); i++ {
 		field := typeData.Field(i)
 		tag := strings.Split(field.Tag.Get(`ohm`), ` `)[0]
-		if tag != `` && tag != `-` && tag != "id" {
+		if tag != `` && tag != `-` && tag != "id" && !strings.Contains(tag, `collection`) {
 			attrs[tag] = i
 		}
 	}
@@ -117,21 +117,6 @@ func modelIndices(model interface{}) map[string][]string {
 	}
 
 	return indices
-}
-
-func modelUniques(model interface{}) []int {
-	uniques := []int{}
-
-	typeData := reflect.TypeOf(model).Elem()
-	for i := 0; i < typeData.NumField(); i++ {
-		field := typeData.Field(i)
-		tag := field.Tag.Get(`ohm`)
-		if strings.Contains(tag, `unique`) {
-			uniques = append(uniques, i)
-		}
-	}
-
-	return uniques
 }
 
 func modelSetID(id string, model interface{}) {
