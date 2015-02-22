@@ -4,38 +4,9 @@ import(
 	"errors"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pote/go-msgpack"
-	"github.com/pote/redisurl"
 	"reflect"
 )
 
-type Connection struct {
-	RedisPool *redis.Pool
-	luaSave   *redis.Script
-}
-
-func NewConnection(r... *redis.Pool) (*Connection, error) {
-	if len(r) < 1 {
-		pool, err := redisurl.NewPool(3, 200, "240s")
-		if err != nil {
-			return &Connection{}, err
-		}	
-
-  return NewConnectionWithPool(pool), nil
-	} else {
-    return NewConnectionWithPool(r[0]), nil
-	}
-
-}
-
-func NewConnectionWithPool(pool *redis.Pool) *Connection {
-	c := &Connection{
-		RedisPool: pool,
-	}
-
-	c.luaSave = redis.NewScript(0, LUA_SAVE)
-
-	return c
-}
 
 func (c *Connection) Save(model interface{}) (error) {
 	if err := validateModel(model); err != nil {
@@ -96,11 +67,6 @@ func (c *Connection) Save(model interface{}) (error) {
 func (c *Connection) Load(model interface{}) (err error) {
 	if err := validateModel(model); err != nil {
 		return err
-	}
-
-	if modelID(model) == "" {
-		err = errors.New(`model does not have a set ohm:"id"`)
-		return
 	}
 
 	conn := c.RedisPool.Get()
