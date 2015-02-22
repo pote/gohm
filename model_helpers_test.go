@@ -26,9 +26,9 @@ type nonStringIDModel struct {
 }
 
 type modelWithReference struct {
-	ID          string `ohm:"id"`
-	Email       string `ohm:"email index"`
-	ForeignKey  string `ohm:"foreign_key reference"`
+	ID                string `ohm:"id"`
+	Email             string `ohm:"email index"`
+	ExternalModelID   string `ohm:"external_model_id reference ExternalModel"`
 }
 
 func TestValidateModel(t *testing.T) {
@@ -114,23 +114,31 @@ func TestModelIndices(t *testing.T) {
 }
 
 func TestModelReferences(t *testing.T) {
-  u := modelWithReference{ForeignKey: "42"}
+  u := modelWithReference{ExternalModelID: "42"}
   references := modelReferences(&u)
 
-  if len(references) == 0 {
+  if len(references) != 1 {
     t.Error("there were indicices in the model but function didn't return them")
     return
   }
 
-  if references["foreign_key"] != "42" {
+  if references[0]["value"] != "42" {
     t.Error("incorrect value for reference")
+  }
+
+  if references[0]["tag"] != "external_model_id" {
+    t.Error("incorrect tag for reference")
+  }
+
+  if references[0]["referencee"] != "ExternalModel" {
+    t.Error("incorrect tag for reference")
   }
 }
 
 func TestRefernecesAreIndicesToo(t *testing.T) {
   u := modelWithReference{
-    Email:      "pote@tardis.com.uy",
-    ForeignKey: "42",
+    Email:            "pote@tardis.com.uy",
+    ExternalModelID:  "42",
   }
 
   indices := modelIndexMap(&u)
@@ -144,7 +152,7 @@ func TestRefernecesAreIndicesToo(t *testing.T) {
     t.Error("regular indices are not included in modelIndexMap")
   }
 
-  if indices["foreign_key"][0] != "42" {
+  if indices["external_model_id"][0] != "42" {
     t.Error("reference is not treated as index")
   }
 }

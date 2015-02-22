@@ -10,7 +10,6 @@ type user struct {
 	Name    string `ohm:"name"`
 	Email   string `ohm:"email index"`
 	UUID    string `ohm:"uuid  unique"`
-	//Friends []user `ohm:"collection"`
 }
 
 func dbCleanup() {

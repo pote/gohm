@@ -112,11 +112,11 @@ func modelIndexMap(model interface{}) map[string][]string {
     }
   }
 
-  for i, v := range modelReferences(model) {
-    if len(indexMap[i]) == 0 {
-      indexMap[i] = []string{v}
+  for _, r := range modelReferences(model) {
+    if len(indexMap[r["tag"]]) == 0 {
+      indexMap[r["tag"]] = []string{r["value"]}
     } else {
-      indexMap[i] = append(indexMap[i], v)
+      indexMap[r["tag"]] = append(indexMap[r["tag"]], r["value"])
     }
   }
 
@@ -141,8 +141,8 @@ func modelIndices(model interface{}) map[string]string {
 	return indices
 }
 
-func modelReferences(model interface{}) map[string]string {
-  references := map[string]string{}
+func modelReferences(model interface{}) []map[string]string {
+  references := []map[string]string{}
 
 	typeData := reflect.TypeOf(model).Elem()
 	modelData := reflect.ValueOf(model).Elem()
@@ -151,8 +151,12 @@ func modelReferences(model interface{}) map[string]string {
 		field := typeData.Field(i)
 		tag := field.Tag.Get(`ohm`)
 		if strings.Contains(tag, ` reference`) {
-      name := strings.Split(tag, ` `)[0]
-			references[name] = modelData.Field(i).String()
+      reference := map[string]string{
+        "tag":        strings.Split(tag, ` `)[0],
+        "value":      modelData.Field(i).String(),
+        "referencee": strings.Split(tag, ` `)[2],
+      }
+      references = append(references, reference)
 		}
 	}
 
