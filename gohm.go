@@ -41,7 +41,7 @@ func (c *Connection) Save(model interface{}) (error) {
 	}
 
 	// Prepare Ohm-scripts `indices` parameter.
-	ohmIndices, err := msgpack.Marshal(modelIndices(model))
+	ohmIndices, err := msgpack.Marshal(modelIndexMap(model))
 	if err != nil {
 		return err
 	}

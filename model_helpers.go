@@ -101,8 +101,30 @@ func modelIDFieldName(model interface{}) (fieldName string) {
 	return
 }
 
-func modelIndices(model interface{}) map[string][]string {
-  indices := map[string][]string{}
+func modelIndexMap(model interface{}) map[string][]string {
+  indexMap := map[string][]string{}
+
+  for i, v := range modelIndices(model) {
+    if len(indexMap[i]) == 0 {
+      indexMap[i] = []string{v}
+    } else {
+      indexMap[i] = append(indexMap[i], v)
+    }
+  }
+
+  for i, v := range modelReferences(model) {
+    if len(indexMap[i]) == 0 {
+      indexMap[i] = []string{v}
+    } else {
+      indexMap[i] = append(indexMap[i], v)
+    }
+  }
+
+  return indexMap
+}
+
+func modelIndices(model interface{}) map[string]string {
+  indices := map[string]string{}
 
 	typeData := reflect.TypeOf(model).Elem()
 	modelData := reflect.ValueOf(model).Elem()
@@ -110,13 +132,31 @@ func modelIndices(model interface{}) map[string][]string {
 	for i := 0; i < typeData.NumField(); i++ {
 		field := typeData.Field(i)
 		tag := field.Tag.Get(`ohm`)
-		if strings.Contains(tag, `index`) {
+		if strings.Contains(tag, ` index`) {
       name := strings.Split(tag, ` `)[0]
-			indices[name] = []string{modelData.Field(i).String()}
+			indices[name] = modelData.Field(i).String()
 		}
 	}
 
 	return indices
+}
+
+func modelReferences(model interface{}) map[string]string {
+  references := map[string]string{}
+
+	typeData := reflect.TypeOf(model).Elem()
+	modelData := reflect.ValueOf(model).Elem()
+
+	for i := 0; i < typeData.NumField(); i++ {
+		field := typeData.Field(i)
+		tag := field.Tag.Get(`ohm`)
+		if strings.Contains(tag, ` reference`) {
+      name := strings.Split(tag, ` `)[0]
+			references[name] = modelData.Field(i).String()
+		}
+	}
+
+	return references
 }
 
 func modelSetID(id string, model interface{}) {
