@@ -123,15 +123,15 @@ func TestModelReferences(t *testing.T) {
   }
 
   if references[0]["value"] != "42" {
-    t.Error("incorrect value for reference")
+    t.Errorf("incorrect value for reference: %v", references[0]["value"])
   }
 
   if references[0]["tag"] != "external_model_id" {
-    t.Error("incorrect tag for reference")
+    t.Errorf("incorrect tag for reference: %v", references[0]["tag"])
   }
 
   if references[0]["referencee"] != "ExternalModel" {
-    t.Error("incorrect tag for reference")
+    t.Errorf("incorrect referencee name for reference: %v", references[0]["referencee"])
   }
 }
 
