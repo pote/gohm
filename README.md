@@ -1,6 +1,6 @@
 # Gohm ॐ ![build](https://travis-ci.org/pote/gohm.svg)
 
-Gohm is a Go port of the popular [Ohm](https://github.com/soveran/ohm) Ruby library, it provides a simple interface to store and retrieve your model data in a Redis database.
+Gohm is a Go port of the popular [Ohm](https://github.com/soveran/ohm) Ruby library, it provides a simple interface to store and retrieve your model data in a [Redis](http://redis.io/) database.
 
 ## Ohm compatibility
 
