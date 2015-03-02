@@ -24,10 +24,10 @@ As you can see, when you describe your Go struct you specify the fields that Goh
 
 The two special considerations you need to keep in your struct for it to be Gohm-compliant are:
 
-1) It must have a field tagged as `id`.
-2) All fields tagged with `ohm` need to be public (capitalized)\*
+* It must have a field tagged as `id`.
+* All fields tagged with `ohm` need to be public (capitalized)\*
 
-* Only necessary because of how Go's reflection works, Gohms need to be able to manipulate the attribute and it's value.
+(*) Only necessary because of how Go's reflection works, Gohms need to be able to manipulate the attribute and it's value.
 
 
 ### Setting up the Gohm connection.
